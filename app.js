@@ -15,13 +15,27 @@ const app = express();
 app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: false }));
+app.use('/wiki', require('./routes/wiki'))
+app.use('/user', require('./routes/user'))
 
-app.get('/', (req, res) => {
-  res.send(main());
+app.get('/', (req, res, next) => {
+  try{
+  res.redirect(301,'/wiki');
+  } catch(err) {
+    next(err)
+  }
 });
 
 const PORT = 3000;
 
+let sync = async () => {
+await db.sync({force: true})
 app.listen(PORT, () => {
   console.log('Server is running on ' + PORT);
 });
+}
+
+sync()
+
+
+
